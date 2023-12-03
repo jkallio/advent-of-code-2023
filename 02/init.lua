@@ -52,26 +52,30 @@ local function countRgb(set)
     return count
 end
 
-local max_rgb = { 12, 13, 14 }
+local ruleset_rgb = { 12, 13, 14 }
 local sum = 0
+local power_sum = 0
 for line in file:lines() do
     local line_parts = line:split(":")
     local game_index_parts = line_parts[1]:split(" ")
     local index = tonumber(game_index_parts[2])
 
     local parts = line_parts[2]:split(";")
-    local seen_rgb = { 0, 0, 0 }
+    local max_rgb = { 0, 0, 0 }
     for _, part in ipairs(parts) do
         local rgb_count = countRgb(part)
         for j, count in ipairs(rgb_count) do
-            if count > seen_rgb[j] then
-                seen_rgb[j] = count
+            if count > max_rgb[j] then
+                max_rgb[j] = count
             end
         end
     end
-    if seen_rgb[1] <= max_rgb[1] and seen_rgb[2] <= max_rgb[2] and seen_rgb[3] <= max_rgb[3] then
+    local power = max_rgb[1] * max_rgb[2] * max_rgb[3]
+    power_sum = power_sum + power
+
+    if max_rgb[1] <= ruleset_rgb[1] and max_rgb[2] <= ruleset_rgb[2] and max_rgb[3] <= ruleset_rgb[3] then
         sum = sum + index
-        print(index .. ": (" .. seen_rgb[1] .. "," .. seen_rgb[2] .. "," .. seen_rgb[3] .. ")")
     end
 end
 print("Sum of IDs: " .. sum)
+print("Power Sum: " .. power_sum)
