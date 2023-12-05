@@ -56,22 +56,30 @@ for line in file:lines() do
 end
 
 --- Then find all the numbers that are next to a seeker
-local parts = {}
+local sum = 0
 for coords, seeker in pairs(seekers) do
-    local x, y = getCoords(coords)
-    for i = -1, 1 do
-        for j = -1, 1 do
-            local digit = getDigit(map, x + i, y + j)
-            if digit then
-                local key, num = getNumber(map, x + i, y + j)
-                parts[key] = num
+    local gears = {}
+    if seeker == "*" then
+        local x, y = getCoords(coords)
+        local parts = {}
+        for i = -1, 1 do
+            for j = -1, 1 do
+                local digit = getDigit(map, x + i, y + j)
+                if digit then
+                    local key, num = getNumber(map, x + i, y + j)
+                    gears[key] = num
+                end
             end
         end
     end
+    local count = 0
+    local ratio = 1
+    for _, value in pairs(gears) do
+        count = count + 1
+        ratio = ratio * value
+    end
+    if count == 2 then
+        sum = sum + ratio
+    end
 end
-
-local sum = 0
-for _, value in pairs(parts) do
-    sum = sum + value
-end
-print("Sum of parts: ", sum)
+print("Sum of gear ratios: ", sum)
