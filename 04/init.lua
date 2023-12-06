@@ -33,29 +33,44 @@ function string:split(delim)
     return result
 end
 
-local total = 0
+local numbers = {}
+local winningNumbers = {}
+local cardStack = {}
+local lineCount = 0
 for line in file:lines() do
+    lineCount = lineCount + 1
     local colon = string.find(line, ":")
     local pipe = string.find(line, "|")
     local sub1 = string.sub(line, colon + 2, pipe - 2)
     local sub2 = string.sub(line, pipe + 2, -1)
 
     local nums = string.split(sub1, " ")
-    local pool = string.split(sub2, " ")
+    local wins = string.split(sub2, " ")
 
-    local points = 0
+    table.insert(numbers, { lineCount, nums })
+    table.insert(winningNumbers, { lineCount, wins })
+    table.insert(cardStack, { 1, lineCount })
+end
+
+local cardCount = 0
+for i = 1, lineCount do
+    local parts = cardStack[i]
+    if parts == nil then break end
+    local multpl = parts[1]
+    local cardNum = parts[2]
+
+    cardCount = cardCount + multpl
+    local nums = numbers[cardNum][2]
+    local wins = winningNumbers[cardNum][2]
+
+    local winCount = 0
     for _, num in ipairs(nums) do
-        for _, p in ipairs(pool) do
-            if num == p then
-                if points == 0 then
-                    points = 1
-                else
-                    points = points * 2
-                end
+        for _, win in ipairs(wins) do
+            if num == win then
+                winCount = winCount + 1
+                cardStack[i + winCount][1] = cardStack[i + winCount][1] + multpl
             end
         end
     end
-    print(sub1 .. " --|-- " .. sub2 .. " --|-- " .. points)
-    total = total + points
 end
-print("Total:", total)
+print(cardCount)
